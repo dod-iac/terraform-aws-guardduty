@@ -21,3 +21,15 @@ variable "kms_key_tags" {
   description = "Tags to apply to the AWS KMS Key used to encrypt exports to S3."
   default     = {}
 }
+
+variable "s3_bucket_name" {
+  type        = string
+  description = "The name of the S3 bucket that receives findings from GuardDuty.  If blank, then GuardDuty does not export findings to S3."
+  default     = ""
+}
+
+variable "s3_bucket_prefix" {
+  type        = string
+  description = "The prefix for where findings from GuardDuty are stored in the S3 bucket.  Should start with \"/\" if defined.  GuardDuty will build the full destination ARN using this format: <s3_bucket_arn><s3_bucket_prefix>/AWSLogs/<account_id>/GuardDuty/<region>."
+  default     = "/guardduty"
+}
