@@ -31,6 +31,22 @@
  * }
  * ```
  *
+ * You can exports GuardDuty findings to a S3 bucket using the s3_bucket_name variable.
+ *
+ * ```hcl
+ * module "guardduty" {
+ *   source = "dod-iac/guardduty/aws"
+ *
+ *   enable = true
+ *   s3_bucket_name = module.logs.aws_logs_bucket
+ *   tags = {
+ *     Application = var.application
+ *     Environment = var.environment
+ *     Automation  = "Terraform"
+ *   }
+ * }
+ * ```
+ *
  * ## Terraform Version
  *
  * Terraform 0.12. Pin module version to ~> 1.0.0 . Submit pull-requests to master branch.
@@ -102,6 +118,34 @@ resource "aws_guardduty_detector" "main" {
   depends_on = [
     aws_kms_key.guardduty,
     aws_kms_alias.guardduty
+  ]
+}
+
+data "aws_s3_bucket" "main" {
+  count  = length(var.s3_bucket_name) > 0 ? 1 : 0
+  bucket = var.s3_bucket_name
+}
+
+# GuardDuty expects a folder to exist, otherwise it throws an error.
+resource "aws_s3_bucket_object" "guardduty" {
+  count  = length(var.s3_bucket_name) > 0 && length(var.s3_bucket_prefix) > 0 ? 1 : 0
+  bucket = data.aws_s3_bucket.main.0.id
+  acl    = "private"
+  key    = var.s3_bucket_prefix == "/" ? "/" : format("%s/", (
+    substr(var.s3_bucket_prefix, 0, 1) == "/" ?
+    substr(var.s3_bucket_prefix, 1, length(var.s3_bucket_prefix)) :
+    var.s3_bucket_prefix
+  ))
+  source = "/dev/null"
+}
+
+resource "aws_guardduty_publishing_destination" "main" {
+  count           = length(var.s3_bucket_name) > 0 ? 1 : 0
+  detector_id     = aws_guardduty_detector.main.id
+  destination_arn = format("%s%s", data.aws_s3_bucket.main.0.arn, (length(var.s3_bucket_prefix) > 0 ? var.s3_bucket_prefix : "/"))
+  kms_key_arn     = aws_kms_key.guardduty.arn
+  depends_on = [
+    aws_s3_bucket_object.guardduty
   ]
 }
 
