@@ -131,7 +131,7 @@ resource "aws_s3_bucket_object" "guardduty" {
   count  = length(var.s3_bucket_name) > 0 && length(var.s3_bucket_prefix) > 0 ? 1 : 0
   bucket = data.aws_s3_bucket.main.0.id
   acl    = "private"
-  key    = var.s3_bucket_prefix == "/" ? "/" : format("%s/", (
+  key = var.s3_bucket_prefix == "/" ? "/" : format("%s/", (
     substr(var.s3_bucket_prefix, 0, 1) == "/" ?
     substr(var.s3_bucket_prefix, 1, length(var.s3_bucket_prefix)) :
     var.s3_bucket_prefix

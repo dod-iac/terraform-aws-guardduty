@@ -85,4 +85,5 @@ This project constitutes a work of the United States Government and is not subje
 | Name | Description |
 |------|-------------|
 | aws\_cloudwatch\_event\_rule\_name | Name of the CloudWatch rule that watches for AWS GuardDuty findings. |
+| aws\_guardduty\_detector\_id | The ID of the GuardDuty detector. |
 
