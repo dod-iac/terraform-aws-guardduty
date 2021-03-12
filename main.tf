@@ -104,7 +104,7 @@ resource "aws_kms_key" "guardduty" {
   deletion_window_in_days = 30
   policy                  = data.aws_iam_policy_document.key_policy.json
   enable_key_rotation     = true
-  tags                    = var.kms_key_tags
+  tags                    = var.tags
 }
 
 resource "aws_kms_alias" "guardduty" {
@@ -162,4 +162,27 @@ resource "aws_cloudwatch_event_rule" "guardduty_findings" {
     ]
   }
   EOF
+
+  tags = var.tags
+}
+
+# More details about the response syntax can be found here:
+# https://docs.aws.amazon.com/guardduty/latest/ug/get-findings.html#get-findings-response-syntax
+resource "aws_cloudwatch_event_target" "guardduty_findings" {
+  count = length(var.sns_topic_arn) ? 1 : 0
+
+  rule = aws_cloudwatch_event_rule.guardduty_findings.name
+
+  arn = var.sns_topic_arn
+
+  input_transformer {
+    input_paths = {
+      account     = "$.detail.accountId"
+      title       = "$.detail.title"
+      description = "$.detail.description"
+      eventTime   = "$.detail.service.eventFirstSeen"
+      region      = "$.detail.region"
+    }
+    input_template = "\"GuardDuty finding in account <account> <region> first seen at <eventTime>: <title> <description>\""
+  }
 }

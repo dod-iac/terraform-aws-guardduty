@@ -16,9 +16,9 @@ variable "kms_alias_name" {
   default     = "alias/guardduty"
 }
 
-variable "kms_key_tags" {
+variable "tags" {
   type        = map(string)
-  description = "Tags to apply to the AWS KMS Key used to encrypt exports to S3."
+  description = "Tags to apply to the AWS Resources."
   default     = {}
 }
 
@@ -32,4 +32,10 @@ variable "s3_bucket_prefix" {
   type        = string
   description = "The prefix for where findings from GuardDuty are stored in the S3 bucket.  Should start with \"/\" if defined.  GuardDuty will build the full destination ARN using this format: <s3_bucket_arn><s3_bucket_prefix>/AWSLogs/<account_id>/GuardDuty/<region>."
   default     = "/guardduty"
+}
+
+variable "sns_topic_arn" {
+  type        = string
+  description = "The ARN of an SNS Topic to send events to."
+  default     = ""
 }
