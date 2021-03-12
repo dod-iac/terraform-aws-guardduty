@@ -30,7 +30,7 @@ variable "s3_bucket_name" {
 
 variable "s3_bucket_prefix" {
   type        = string
-  description = "The prefix for where findings from GuardDuty are stored in the S3 bucket.  Should start with \"/\" if defined.  GuardDuty will build the full destination ARN using this format: <s3_bucket_arn><s3_bucket_prefix>/AWSLogs/<account_id>/GuardDuty/<region>."
+  description = "The prefix for where findings from GuardDuty are stored in the S3 bucket.  Should start with \"/\" if defined.  GuardDuty will build the full destination ARN using this format: S3BUCKETARNS3BUCKETPREFIX/AWSLogs/ACCOUNTID/GuardDuty/REGION."
   default     = "/guardduty"
 }
 
