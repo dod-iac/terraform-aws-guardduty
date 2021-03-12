@@ -169,7 +169,7 @@ resource "aws_cloudwatch_event_rule" "guardduty_findings" {
 # More details about the response syntax can be found here:
 # https://docs.aws.amazon.com/guardduty/latest/ug/get-findings.html#get-findings-response-syntax
 resource "aws_cloudwatch_event_target" "guardduty_findings" {
-  count = length(var.sns_topic_arn) ? 1 : 0
+  count = length(var.sns_topic_arn) > 0 ? 1 : 0
 
   rule = aws_cloudwatch_event_rule.guardduty_findings.name
 
